@@ -1,19 +1,65 @@
 package server
 
-type Server interface {
+import (
+	"context"
+	"fmt"
+	"net"
+	"strconv"
+	"zipper/common"
+	"zipper/logger"
+	"zipper/pool"
+)
+
+// ZipperServer service layer interface abstraction
+type ZipperServer interface {
 	// Run 启动方法
 	Run()
 }
 
-type ZipperServer struct {
-	// 服务名称
-	Name string
-	// ip 地址
-	Ip string
-	// 端口号
-	Port uint16
+type zServer struct {
+	// service name
+	name string
+	// port number
+	port uint16
+	// message queue worker pool
+	pool pool.ZipperPool
 }
 
-func (zs *ZipperServer) Run() {
+func NewZServer() ZipperServer {
+	return &zServer{}
+}
 
+func (zs *zServer) Run() {
+	// 1. initialize the top-level context, for coroutine safety
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	defer cancelFunc()
+
+	// 2. start the log service
+	go logger.InitLogServer(ctx)
+
+	// 3. start the message queue worker pool according to the configuration
+	// zPool := &pool.ZPool{}
+	// zPool.InitPool()
+	// 2. initialize the service object
+
+	// 监听
+	addr, err := net.ResolveTCPAddr("tcp", ":"+strconv.Itoa(int(common.GlobalConfig.Port)))
+	if err != nil {
+		logger.OutLog(err.Error())
+		panic(err)
+	}
+	tcp, err := net.ListenTCP("tcp", addr)
+	if err != nil {
+		logger.OutLog(err.Error())
+		panic(err)
+	}
+	for {
+		conn, err := tcp.AcceptTCP()
+		if err != nil {
+			logger.OutLog(err.Error())
+			continue
+		}
+		// 创建链接层模型
+		fmt.Println(conn)
+	}
 }
