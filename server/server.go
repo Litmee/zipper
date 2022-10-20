@@ -8,25 +8,26 @@ import (
 	"zipper/common"
 	"zipper/logger"
 	"zipper/pool"
+	"zipper/route"
 )
 
 // ZipperServer service layer interface abstraction
 type ZipperServer interface {
-	// Run 启动方法
+	// Run start method
 	Run()
+	// AddRouter add message id routing mapping
+	AddRouter(id uint16, tr route.ZipperRouter)
 }
 
 type zServer struct {
-	// service name
-	name string
-	// port number
-	port uint16
 	// message queue worker pool
 	pool pool.ZipperPool
 }
 
 func NewZServer() ZipperServer {
-	return &zServer{}
+	return &zServer{
+		pool: &pool.ZPool{},
+	}
 }
 
 func (zs *zServer) Run() {
@@ -62,4 +63,8 @@ func (zs *zServer) Run() {
 		// 创建链接层模型
 		fmt.Println(conn)
 	}
+}
+
+func (zs *zServer) AddRouter(id uint16, rt route.ZipperRouter) {
+	// zs.pool.AddRouter(id, rt)
 }

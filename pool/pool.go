@@ -1,17 +1,19 @@
 package pool
 
-import "zipper/common"
+import "zipper/route"
 
 // ZipperPool work queue task pool abstraction layer
 type ZipperPool interface {
+	InitPool()
 }
 
 type ZPool struct {
-	queue []*ZipperQueue
-	size  uint16
+	Queue []*ZipperQueue
+	Rm    map[uint16]route.ZipperRouter
 }
 
 // InitPool initialize the worker pool
+
 func (zp *ZPool) InitPool() {
-	zp.size = common.GlobalConfig.QueueSize
+
 }
