@@ -3,12 +3,12 @@ package connect
 import (
 	"context"
 	"fmt"
+	"github.com/Litmee/zipper/common"
+	"github.com/Litmee/zipper/logger"
+	"github.com/Litmee/zipper/message"
+	"github.com/Litmee/zipper/pack"
 	"io"
 	"net"
-	"zipper/common"
-	"zipper/logger"
-	"zipper/message"
-	"zipper/pack"
 )
 
 // ZipperConnect TCP connection layer abstraction

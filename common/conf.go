@@ -3,9 +3,9 @@ package common
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Litmee/zipper/logger"
 	"os"
 	"strconv"
-	"zipper/logger"
 )
 
 // ZipperConfig middleware configuration structure

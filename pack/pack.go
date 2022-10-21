@@ -3,7 +3,7 @@ package pack
 import (
 	"bytes"
 	"encoding/binary"
-	"zipper/message"
+	"github.com/Litmee/zipper/message"
 )
 
 // ZipperPack TCP data unpacking abstraction layer

@@ -2,11 +2,11 @@ package connect
 
 import (
 	"context"
+	"github.com/Litmee/zipper/common"
+	"github.com/Litmee/zipper/logger"
+	"github.com/Litmee/zipper/message"
 	"strconv"
 	"time"
-	"zipper/common"
-	"zipper/logger"
-	"zipper/message"
 )
 
 // ZipperPool work queue task pool abstraction layer

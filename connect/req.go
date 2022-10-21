@@ -1,7 +1,7 @@
 package connect
 
 import (
-	"zipper/message"
+	"github.com/Litmee/zipper/message"
 )
 
 type ZipperRequest interface {

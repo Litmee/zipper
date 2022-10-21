@@ -2,11 +2,11 @@ package server
 
 import (
 	"context"
+	"github.com/Litmee/zipper/common"
+	"github.com/Litmee/zipper/connect"
+	"github.com/Litmee/zipper/logger"
 	"net"
 	"strconv"
-	"zipper/common"
-	"zipper/connect"
-	"zipper/logger"
 )
 
 // ZipperServer service layer interface abstraction
