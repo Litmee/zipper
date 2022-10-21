@@ -14,7 +14,7 @@ type ZipperServer interface {
 	// Run start method
 	Run()
 	// AddRouter add message id routing mapping
-	AddRouter(id uint16, tr connect.ZipperRouter)
+	AddRouter(id uint16, rt connect.ZipperRouter)
 }
 
 type zServer struct {
@@ -24,10 +24,11 @@ type zServer struct {
 
 func NewZServer() ZipperServer {
 	return &zServer{
-		pool: &connect.ZPool{Rm: make(map[uint16]connect.ZipperRouter)},
+		pool: connect.NewZPool(),
 	}
 }
 
+// Run start method
 func (zs *zServer) Run() {
 	// 1. initialize the top-level context, for coroutine safety
 	ctx, cancelFunc := context.WithCancel(context.Background())
@@ -39,7 +40,7 @@ func (zs *zServer) Run() {
 	// 3. start the message queue worker pool according to the configuration
 	zs.pool.InitPool(ctx)
 
-	// monitor
+	// 4. monitor
 	addr, err := net.ResolveTCPAddr("tcp", ":"+strconv.Itoa(int(common.GlobalConfig.Port)))
 	if err != nil {
 		logger.OutLog(err.Error(), logger.ERROR)
@@ -56,12 +57,18 @@ func (zs *zServer) Run() {
 			logger.OutLog(err.Error(), logger.ERROR)
 			continue
 		}
+		// if the current number of links is already greater than MaxConnect, close
+		if !common.Add() {
+			conn.Close()
+			continue
+		}
 		// create a Linked Layer Model
 		zConnect := connect.NewZConnect(conn, zs.pool)
 		go zConnect.Start(ctx)
 	}
 }
 
+// AddRouter add message id routing mapping
 func (zs *zServer) AddRouter(id uint16, rt connect.ZipperRouter) {
 	zs.pool.AddRouter(id, rt)
 }
