@@ -7,9 +7,6 @@ import (
 	"zipper/logger"
 )
 
-// framework version information
-var zipperVersion = "	Zipper v1.01, go 1.19"
-
 // ZipperConfig middleware configuration structure
 type ZipperConfig struct {
 	// server name
@@ -48,6 +45,11 @@ func init() {
 		logger.OutLog(err.Error(), logger.WARN)
 		logger.OutLog("The json configuration file was not read, path = ./conf/zipper.json", logger.WARN)
 		logger.OutLog("The system will enable the default configuration", logger.WARN)
+		logger.OutLog("The port is 8066", logger.INFO)
+		logger.OutLog("The QueueSize is 200", logger.INFO)
+		logger.OutLog("The PoolSize is 6", logger.INFO)
+		logger.OutLog("The MaxPackSize is 1024", logger.INFO)
+		logger.OutLog("The MaxConnect is 30", logger.INFO)
 		return
 	}
 	// parse json file content
