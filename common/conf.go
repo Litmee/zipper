@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 	"zipper/logger"
 )
 
@@ -45,12 +46,7 @@ func init() {
 		logger.OutLog(err.Error(), logger.WARN)
 		logger.OutLog("The json configuration file was not read, path = ./conf/zipper.json", logger.WARN)
 		logger.OutLog("The system will enable the default configuration", logger.WARN)
-		logger.OutLog("The port is 8066", logger.INFO)
-		logger.OutLog("The QueueSize is 200", logger.INFO)
-		logger.OutLog("The PoolSize is 6", logger.INFO)
-		logger.OutLog("The MaxPackSize is 1024", logger.INFO)
-		logger.OutLog("The MaxConnect is 30", logger.INFO)
-		return
+		goto logs
 	}
 	// parse json file content
 	err = json.Unmarshal(file, GlobalConfig)
@@ -58,4 +54,10 @@ func init() {
 		logger.OutLog("json configuration file parsing exception", logger.ERROR)
 		panic(err)
 	}
+logs:
+	logger.OutLog("The port is "+strconv.Itoa(int(GlobalConfig.Port)), logger.INFO)
+	logger.OutLog("The QueueSize is "+strconv.Itoa(int(GlobalConfig.QueueSize)), logger.INFO)
+	logger.OutLog("The PoolSize is "+strconv.Itoa(int(GlobalConfig.PoolSize)), logger.INFO)
+	logger.OutLog("The MaxPackSize is "+strconv.Itoa(int(GlobalConfig.MaxPackSize)), logger.INFO)
+	logger.OutLog("The MaxConnect is "+strconv.Itoa(int(GlobalConfig.MaxConnect)), logger.INFO)
 }
