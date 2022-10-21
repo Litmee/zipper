@@ -5,9 +5,23 @@ import (
 	"log"
 )
 
+const (
+	INFO = iota
+	WARN
+	ERROR
+)
+
 var Logger = make(chan string, 200)
 
-func OutLog(s string) {
+func OutLog(s string, t int) {
+	switch t {
+	case INFO:
+		s = "INFO " + s
+	case WARN:
+		s = "WARN " + s
+	case ERROR:
+		s = "ERROR " + s
+	}
 	Logger <- s
 }
 
