@@ -2,8 +2,10 @@ package connect
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net"
+	"zipper/common"
 	"zipper/logger"
 	"zipper/message"
 	"zipper/pack"
@@ -13,12 +15,12 @@ import (
 type ZipperConnect interface {
 	// Start run link
 	Start(ctx context.Context)
-	// ZRead 读业务
+	// zRead read business part processing function
 	zRead(ctx context.Context, f context.CancelFunc)
-	// ZWrite 写业务
+	// ZWrite write the business part processing function
 	zWrite(ctx context.Context, f context.CancelFunc)
-	// Send write-back message
-	Send(m message.ZipperMessage)
+	// send write-back message
+	send(m message.ZipperMessage)
 }
 
 type zConnect struct {
@@ -34,6 +36,7 @@ func NewZConnect(conn *net.TCPConn, pool ZipperPool) ZipperConnect {
 	return &zConnect{conn, pool, make(chan message.ZipperMessage)}
 }
 
+// Start run link
 func (zc *zConnect) Start(ctx context.Context) {
 	// iterates out new context control parameters
 	newCtx, cancelFunc := context.WithCancel(ctx)
@@ -43,8 +46,10 @@ func (zc *zConnect) Start(ctx context.Context) {
 	go zc.zWrite(newCtx, cancelFunc)
 }
 
+// zRead read business part processing function
 func (zc *zConnect) zRead(ctx context.Context, f context.CancelFunc) {
 	defer f()
+	defer common.Cut()
 	// create Packet Unpacking Parameters
 	zPack := pack.NewZPack()
 	for {
@@ -73,13 +78,15 @@ func (zc *zConnect) zRead(ctx context.Context, f context.CancelFunc) {
 		// splice body
 		msg.SetBody(body)
 		// send to queue
-		zc.pool.AddQueue(zc, msg)
+		zc.pool.addQueue(zc, msg)
 	}
 
 }
 
+// zWrite write the business part processing function
 func (zc *zConnect) zWrite(ctx context.Context, f context.CancelFunc) {
 	defer f()
+	defer fmt.Println("一切都结束了2")
 	zPack := pack.NewZPack()
 	for {
 		msg := <-zc.msgChan
@@ -96,6 +103,7 @@ func (zc *zConnect) zWrite(ctx context.Context, f context.CancelFunc) {
 	}
 }
 
-func (zc *zConnect) Send(m message.ZipperMessage) {
+// send write-back message
+func (zc *zConnect) send(m message.ZipperMessage) {
 	zc.msgChan <- m
 }

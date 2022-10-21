@@ -15,74 +15,78 @@ type ZipperPool interface {
 	InitPool(ctx context.Context)
 	// AddRouter add message id routing mapping
 	AddRouter(id uint16, rt ZipperRouter)
-	// RunQueue open queue job
-	RunQueue(ctx context.Context, id int, queue chan ZipperRequest)
-	// ConsumeMessage Consuming messages
-	ConsumeMessage(req ZipperRequest)
-	// AddQueue add messages to the queue by pseudo load balancing
-	AddQueue(c ZipperConnect, m message.ZipperMessage)
+	// runQueue open queue job
+	runQueue(ctx context.Context, id int, queue chan ZipperRequest)
+	// consumeMessage Consuming messages
+	consumeMessage(req ZipperRequest)
+	// addQueue add messages to the queue by pseudo load balancing
+	addQueue(c ZipperConnect, m message.ZipperMessage)
 }
 
-type ZPool struct {
-	QueuePool []chan ZipperRequest
-	Rm        map[uint16]ZipperRouter
-	Size      uint8
+type zPool struct {
+	queuePool []chan ZipperRequest
+	rm        map[uint16]ZipperRouter
+	size      uint8
+}
+
+func NewZPool() ZipperPool {
+	return &zPool{rm: make(map[uint16]ZipperRouter)}
 }
 
 // InitPool initialize the worker pool
-func (zp *ZPool) InitPool(ctx context.Context) {
+func (zp *zPool) InitPool(ctx context.Context) {
 	if common.GlobalConfig.PoolSize == 0 || common.GlobalConfig.QueueSize == 0 {
 		logger.OutLog("There is an exception in the PoolSize or QueueSize configuration items in the json configuration file", logger.ERROR)
 		panic("The PoolSize or QueueSize configuration item in the system json configuration file has a value of 0 or an abnormal value")
 	}
-	zp.Size = common.GlobalConfig.PoolSize
-	zp.QueuePool = make([]chan ZipperRequest, zp.Size)
-	for i := 0; i < int(zp.Size); i++ {
-		zp.QueuePool[i] = make(chan ZipperRequest, common.GlobalConfig.QueueSize)
-		go zp.RunQueue(ctx, i, zp.QueuePool[i])
+	zp.size = common.GlobalConfig.PoolSize
+	zp.queuePool = make([]chan ZipperRequest, zp.size)
+	for i := 0; i < int(zp.size); i++ {
+		zp.queuePool[i] = make(chan ZipperRequest, common.GlobalConfig.QueueSize)
+		go zp.runQueue(ctx, i, zp.queuePool[i])
 	}
 }
 
 // AddRouter add message id routing mapping
-func (zp *ZPool) AddRouter(id uint16, rt ZipperRouter) {
-	if _, ok := zp.Rm[id]; ok {
+func (zp *zPool) AddRouter(id uint16, rt ZipperRouter) {
+	if _, ok := zp.rm[id]; ok {
 		logger.OutLog("Message id map insert failed, id = "+strconv.Itoa(int(id)), logger.ERROR)
 		panic("There is a conflict in the routing message id mapping")
 		return
 	}
-	zp.Rm[id] = rt
+	zp.rm[id] = rt
 }
 
-// RunQueue open queue job
-func (zp *ZPool) RunQueue(ctx context.Context, id int, queue chan ZipperRequest) {
+// runQueue open queue job
+func (zp *zPool) runQueue(ctx context.Context, id int, queue chan ZipperRequest) {
 	logger.OutLog("Queue id = "+strconv.Itoa(id)+" is running", logger.INFO)
 	for {
 		select {
 		case req := <-queue:
-			zp.ConsumeMessage(req)
+			zp.consumeMessage(req)
 		}
 	}
 }
 
-// ConsumeMessage Consuming messages
-func (zp *ZPool) ConsumeMessage(req ZipperRequest) {
+// consumeMessage Consuming messages
+func (zp *zPool) consumeMessage(req ZipperRequest) {
 	// get the corresponding route according to the message id
-	router, ok := zp.Rm[req.GetMsgId()]
-	if !ok {
-		logger.OutLog("", logger.ERROR)
+	router, ok := zp.rm[req.GetMsgId()]
+	if !ok || router == nil {
+		logger.OutLog("The route corresponding to the message id = "+strconv.Itoa(int(req.GetMsgId()))+" is not found, the id may be wrong or the route itself is nil", logger.ERROR)
 		return
 	}
 	msg := router.Handler(req)
 	if msg != nil {
-		req.GetConnect().Send(msg)
+		req.GetConnect().send(msg)
 	}
 }
 
-// AddQueue add messages to the queue by pseudo load balancing
-func (zp *ZPool) AddQueue(c ZipperConnect, m message.ZipperMessage) {
+// addQueue add messages to the queue by pseudo load balancing
+func (zp *zPool) addQueue(c ZipperConnect, m message.ZipperMessage) {
 	// generate request
 	zReq := NewZRequest(c, m)
 	// take the remainder to achieve pseudo load balancing, and stuff the request into the queue
-	i := time.Now().Second() % int(zp.Size)
-	zp.QueuePool[i] <- zReq
+	i := time.Now().Second() % int(zp.size)
+	zp.queuePool[i] <- zReq
 }

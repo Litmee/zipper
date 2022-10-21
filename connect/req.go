@@ -22,14 +22,17 @@ func NewZRequest(c ZipperConnect, m message.ZipperMessage) ZipperRequest {
 	return &zRequest{c, m}
 }
 
+// GetMsgId get message id
 func (zr *zRequest) GetMsgId() uint16 {
 	return *zr.msg.GetMsgId()
 }
 
+// GetConnect get link parameters
 func (zr *zRequest) GetConnect() ZipperConnect {
 	return zr.conn
 }
 
+// GetMsg get message
 func (zr *zRequest) GetMsg() message.ZipperMessage {
 	return zr.msg
 }
