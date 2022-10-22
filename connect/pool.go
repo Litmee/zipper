@@ -78,7 +78,7 @@ func (zp *zPool) consumeMessage(req ZipperRequest) {
 	}
 	msg := router.Handler(req)
 	if msg != nil {
-		req.GetConnect().send(msg)
+		req.getConnect().send(msg)
 	}
 }
 

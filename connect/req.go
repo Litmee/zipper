@@ -7,10 +7,10 @@ import (
 type ZipperRequest interface {
 	// GetMsgId get message id
 	GetMsgId() uint16
-	// GetConnect get link parameters
-	GetConnect() ZipperConnect
-	// GetMsg get message
-	GetMsg() message.ZipperMessage
+	// getConnect get link parameters
+	getConnect() ZipperConnect
+	// GetMsgBody get message
+	GetMsgBody() []byte
 }
 
 type zRequest struct {
@@ -28,11 +28,11 @@ func (zr *zRequest) GetMsgId() uint16 {
 }
 
 // GetConnect get link parameters
-func (zr *zRequest) GetConnect() ZipperConnect {
+func (zr *zRequest) getConnect() ZipperConnect {
 	return zr.conn
 }
 
-// GetMsg get message
-func (zr *zRequest) GetMsg() message.ZipperMessage {
-	return zr.msg
+// GetMsgBody get message
+func (zr *zRequest) GetMsgBody() []byte {
+	return zr.msg.GetBody()
 }
