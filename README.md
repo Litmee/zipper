@@ -72,7 +72,7 @@ zipper.json 有效字段格式如下
 Port        ===> 端口(uint16 类型, 注意范围)
 QueueSize   ===> 消息队列容量(uint16 类型, 注意范围)
 PoolSize    ===> 队列工作池容量(uint8 类型, 注意范围)
-MaxPackSize ===> 最大数据包容量(uint16 类型, 注意范围)
+MaxPackSize ===> 最大数据包容量(uint16 类型, 注意范围; 若设置为 0, 则代表没有包大小的限制)
 MaxConnect  ===> 最大 TCP 链接数(uint16 类型, 注意范围)
 LogSize     ===> 日志管道缓冲区容量(uint16 类型, 注意范围)
 ```
