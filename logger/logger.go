@@ -2,7 +2,6 @@ package logger
 
 import (
 	"context"
-	"github.com/Litmee/zipper/common"
 	"log"
 )
 
@@ -12,7 +11,7 @@ const (
 	ERROR
 )
 
-var Logger = make(chan string, common.GlobalConfig.LogSize)
+var logChan chan string
 
 func OutLog(s string, t int) {
 	switch t {
@@ -23,12 +22,13 @@ func OutLog(s string, t int) {
 	case ERROR:
 		s = "ERROR " + s
 	}
-	Logger <- s
+	logChan <- s
 }
 
-func InitLogServer(ctx context.Context) {
+func InitLogServer(ctx context.Context, s uint16) {
+	logChan = make(chan string, s)
 	for {
-		str := <-Logger
+		str := <-logChan
 		log.Println(str)
 	}
 }

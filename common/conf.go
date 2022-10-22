@@ -3,7 +3,7 @@ package common
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Litmee/zipper/logger"
+	"log"
 	"os"
 	"strconv"
 )
@@ -46,21 +46,21 @@ func init() {
 	// read json configuration file
 	file, err := os.ReadFile("conf/zipper.json")
 	if err != nil {
-		logger.OutLog(err.Error(), logger.WARN)
-		logger.OutLog("The json configuration file was not read, path = ./conf/zipper.json", logger.WARN)
-		logger.OutLog("The system will enable the default configuration", logger.WARN)
+		log.Println("WARN " + err.Error())
+		log.Println("WARN The json configuration file was not read, path = ./conf/zipper.json")
+		log.Println("WARN The system will enable the default configuration")
 		goto logs
 	}
 	// parse json file content
 	err = json.Unmarshal(file, GlobalConfig)
 	if err != nil {
-		logger.OutLog("json configuration file parsing exception", logger.ERROR)
+		log.Println("ERROR json configuration file parsing exception")
 		panic(err)
 	}
 logs:
-	logger.OutLog("The port is "+strconv.Itoa(int(GlobalConfig.Port)), logger.INFO)
-	logger.OutLog("The QueueSize is "+strconv.Itoa(int(GlobalConfig.QueueSize)), logger.INFO)
-	logger.OutLog("The PoolSize is "+strconv.Itoa(int(GlobalConfig.PoolSize)), logger.INFO)
-	logger.OutLog("The MaxPackSize is "+strconv.Itoa(int(GlobalConfig.MaxPackSize)), logger.INFO)
-	logger.OutLog("The MaxConnect is "+strconv.Itoa(int(GlobalConfig.MaxConnect)), logger.INFO)
+	log.Println("INFO The port is " + strconv.Itoa(int(GlobalConfig.Port)))
+	log.Println("INFO The QueueSize is " + strconv.Itoa(int(GlobalConfig.QueueSize)))
+	log.Println("INFO The PoolSize is " + strconv.Itoa(int(GlobalConfig.PoolSize)))
+	log.Println("INFO The MaxPackSize is " + strconv.Itoa(int(GlobalConfig.MaxPackSize)))
+	log.Println("INFO The MaxConnect is " + strconv.Itoa(int(GlobalConfig.MaxConnect)))
 }
