@@ -64,6 +64,7 @@ func (zs *zServer) Run() {
 		}
 		// create a Linked Layer Model
 		zConnect := connect.NewZConnect(conn, zs.pool)
+		logger.OutLog("A new connect into", logger.INFO)
 		go zConnect.Start(ctx)
 	}
 }

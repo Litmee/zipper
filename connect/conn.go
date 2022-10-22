@@ -2,7 +2,6 @@ package connect
 
 import (
 	"context"
-	"fmt"
 	"github.com/Litmee/zipper/common"
 	"github.com/Litmee/zipper/logger"
 	"github.com/Litmee/zipper/message"
@@ -86,7 +85,6 @@ func (zc *zConnect) zRead(ctx context.Context, f context.CancelFunc) {
 // zWrite write the business part processing function
 func (zc *zConnect) zWrite(ctx context.Context, f context.CancelFunc) {
 	defer f()
-	defer fmt.Println("一切都结束了2")
 	zPack := pack.NewZPack()
 	for {
 		msg := <-zc.msgChan

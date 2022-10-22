@@ -22,6 +22,8 @@ type ZipperConfig struct {
 	MaxPackSize uint16
 	// maximum number of TCP connections allowed for a single service
 	MaxConnect uint16
+	// logs channel size
+	LogSize uint16
 }
 
 // GlobalConfig global configuration parameters
@@ -39,6 +41,7 @@ func init() {
 		PoolSize:    6,
 		MaxPackSize: 1024,
 		MaxConnect:  30,
+		LogSize:     200,
 	}
 	// read json configuration file
 	file, err := os.ReadFile("conf/zipper.json")
