@@ -62,7 +62,7 @@ func (zc *zConnect) zRead(ctx context.Context, f context.CancelFunc) {
 		msg, err := zPack.UnPack(headData)
 		if err != nil {
 			logger.OutLog("UnPack msg head err: "+err.Error(), logger.ERROR)
-			break
+			continue
 		}
 		// get message body
 		var body []byte

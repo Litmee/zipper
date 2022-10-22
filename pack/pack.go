@@ -3,6 +3,8 @@ package pack
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
+	"github.com/Litmee/zipper/common"
 	"github.com/Litmee/zipper/message"
 )
 
@@ -53,6 +55,11 @@ func (zp *ZPack) UnPack(d []byte) (m message.ZipperMessage, err error) {
 	msg := message.NewZMessage(0, nil)
 	// first read the data length
 	if err = binary.Read(reader, binary.LittleEndian, msg.GetMsgLen()); err != nil {
+		return
+	}
+	// 判断dataLen是否超出允许最大包长度
+	if common.GlobalConfig.MaxPackSize > 0 && *msg.GetMsgLen() > common.GlobalConfig.MaxPackSize {
+		err = errors.New("too large msg data received")
 		return
 	}
 	// then read the message id

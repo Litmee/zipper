@@ -40,7 +40,7 @@ func init() {
 		QueueSize:   200,
 		PoolSize:    6,
 		MaxPackSize: 1024,
-		MaxConnect:  30,
+		MaxConnect:  50,
 		LogSize:     200,
 	}
 	// read json configuration file
