@@ -63,4 +63,5 @@ logs:
 	log.Println("INFO The PoolSize is " + strconv.Itoa(int(GlobalConfig.PoolSize)))
 	log.Println("INFO The MaxPackSize is " + strconv.Itoa(int(GlobalConfig.MaxPackSize)))
 	log.Println("INFO The MaxConnect is " + strconv.Itoa(int(GlobalConfig.MaxConnect)))
+	log.Println("INFO The LogSize is " + strconv.Itoa(int(GlobalConfig.LogSize)))
 }
