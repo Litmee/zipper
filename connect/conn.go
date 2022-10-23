@@ -97,15 +97,15 @@ func (zc *zConnect) zWrite(ctx context.Context) {
 			b, err := zPack.Pack(msg)
 			if err != nil {
 				logger.OutLog("The write-back data packet is abnormal", logger.WARN)
-				continue
+				break
 			}
 			_, err = zc.conn.Write(b)
 			if err != nil {
 				logger.OutLog("TCP write-back data err", logger.ERROR)
-				break
+				return
 			}
 		case <-zc.exitChan:
-			break
+			return
 		}
 	}
 }
