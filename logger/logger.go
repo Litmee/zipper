@@ -25,10 +25,14 @@ func OutLog(s string, t int) {
 	logChan <- s
 }
 
-func InitLogServer(ctx context.Context, s uint16) {
-	logChan = make(chan string, s)
+func logServer(ctx context.Context) {
 	for {
 		str := <-logChan
 		log.Println(str)
 	}
+}
+
+func InitLogServer(ctx context.Context, s uint16) {
+	logChan = make(chan string, s)
+	go logServer(ctx)
 }

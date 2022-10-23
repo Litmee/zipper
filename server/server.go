@@ -35,7 +35,7 @@ func (zs *zServer) Run() {
 	defer cancelFunc()
 
 	// 2. start the log service
-	go logger.InitLogServer(ctx, common.GlobalConfig.LogSize)
+	logger.InitLogServer(ctx, common.GlobalConfig.LogSize)
 
 	// 3. start the message queue worker pool according to the configuration
 	zs.pool.InitPool(ctx)
