@@ -4,4 +4,4 @@ package common
 const Banner = "                                                         \n _|_|_|_|_|  _|                                          \n       _|        _|_|_|    _|_|_|      _|_|    _|  _|_|  \n     _|      _|  _|    _|  _|    _|  _|_|_|_|  _|_|      \n   _|        _|  _|    _|  _|    _|  _|        _|        \n _|_|_|_|_|  _|  _|_|_|    _|_|_|      _|_|_|  _|        \n                 _|        _|                            \n                 _|        _|                            \n\n"
 
 // framework version information
-var zipperVersion = "	Zipper v0.1.4, go 1.19"
+var zipperVersion = "	Zipper v0.1.5, go 1.19"

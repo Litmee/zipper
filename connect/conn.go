@@ -8,6 +8,7 @@ import (
 	"github.com/Litmee/zipper/pack"
 	"io"
 	"net"
+	"sync"
 )
 
 // ZipperConnect TCP connection layer abstraction
@@ -15,11 +16,13 @@ type ZipperConnect interface {
 	// Start run link
 	Start(ctx context.Context)
 	// zRead read business part processing function
-	zRead(ctx context.Context, f context.CancelFunc)
+	zRead(ctx context.Context)
 	// ZWrite write the business part processing function
-	zWrite(ctx context.Context, f context.CancelFunc)
+	zWrite(ctx context.Context)
 	// send write-back message
 	send(m message.ZipperMessage)
+	// stop read and write
+	stop()
 }
 
 type zConnect struct {
@@ -29,26 +32,30 @@ type zConnect struct {
 	pool ZipperPool
 	// write-back message receive pipeline
 	msgChan chan message.ZipperMessage
+	// whether the link has been closed
+	isClosed bool
+	// receive and send exit signal
+	exitChan chan bool
+	// lock
+	rwl sync.RWMutex
 }
 
 func NewZConnect(conn *net.TCPConn, pool ZipperPool) ZipperConnect {
-	return &zConnect{conn, pool, make(chan message.ZipperMessage)}
+	return &zConnect{conn, pool, make(chan message.ZipperMessage), false, make(chan bool, 1), sync.RWMutex{}}
 }
 
 // Start run link
 func (zc *zConnect) Start(ctx context.Context) {
-	// iterates out new context control parameters
-	newCtx, cancelFunc := context.WithCancel(ctx)
 	// open the read method
-	go zc.zRead(newCtx, cancelFunc)
+	go zc.zRead(ctx)
 	// open the write method
-	go zc.zWrite(newCtx, cancelFunc)
+	go zc.zWrite(ctx)
 }
 
 // zRead read business part processing function
-func (zc *zConnect) zRead(ctx context.Context, f context.CancelFunc) {
-	defer f()
+func (zc *zConnect) zRead(ctx context.Context) {
 	defer common.Cut()
+	defer zc.stop()
 	// create Packet Unpacking Parameters
 	zPack := pack.NewZPack()
 	for {
@@ -79,23 +86,25 @@ func (zc *zConnect) zRead(ctx context.Context, f context.CancelFunc) {
 		// send to queue
 		zc.pool.addQueue(zc, msg)
 	}
-
 }
 
 // zWrite write the business part processing function
-func (zc *zConnect) zWrite(ctx context.Context, f context.CancelFunc) {
-	defer f()
+func (zc *zConnect) zWrite(ctx context.Context) {
 	zPack := pack.NewZPack()
 	for {
-		msg := <-zc.msgChan
-		b, err := zPack.Pack(msg)
-		if err != nil {
-			logger.OutLog("The write-back data packet is abnormal", logger.WARN)
-			continue
-		}
-		_, err = zc.conn.Write(b)
-		if err != nil {
-			logger.OutLog("TCP write-back data err", logger.ERROR)
+		select {
+		case msg := <-zc.msgChan:
+			b, err := zPack.Pack(msg)
+			if err != nil {
+				logger.OutLog("The write-back data packet is abnormal", logger.WARN)
+				continue
+			}
+			_, err = zc.conn.Write(b)
+			if err != nil {
+				logger.OutLog("TCP write-back data err", logger.ERROR)
+				break
+			}
+		case <-zc.exitChan:
 			break
 		}
 	}
@@ -103,5 +112,23 @@ func (zc *zConnect) zWrite(ctx context.Context, f context.CancelFunc) {
 
 // send write-back message
 func (zc *zConnect) send(m message.ZipperMessage) {
+	zc.rwl.RLock()
+	defer zc.rwl.RUnlock()
+	if zc.isClosed {
+		return
+	}
 	zc.msgChan <- m
+}
+
+// stop read and write
+func (zc *zConnect) stop() {
+	zc.rwl.Lock()
+	defer zc.rwl.Unlock()
+	if zc.isClosed {
+		return
+	}
+	zc.exitChan <- true
+	zc.isClosed = true
+	close(zc.msgChan)
+	close(zc.exitChan)
 }
