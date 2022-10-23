@@ -61,10 +61,8 @@ func (zp *zPool) AddRouter(id uint16, rt ZipperRouter) {
 func (zp *zPool) runQueue(ctx context.Context, id int, queue chan ZipperRequest) {
 	logger.OutLog("Queue id = "+strconv.Itoa(id)+" is running", logger.INFO)
 	for {
-		select {
-		case req := <-queue:
-			zp.consumeMessage(req)
-		}
+		req := <-queue
+		zp.consumeMessage(req)
 	}
 }
 
