@@ -41,7 +41,7 @@ type zConnect struct {
 }
 
 func NewZConnect(conn *net.TCPConn, pool ZipperPool) ZipperConnect {
-	return &zConnect{conn, pool, make(chan message.ZipperMessage), false, make(chan bool, 1), sync.RWMutex{}}
+	return &zConnect{conn, pool, make(chan message.ZipperMessage, common.GlobalConfig.QueueSize), false, make(chan bool, 1), sync.RWMutex{}}
 }
 
 // Start run link

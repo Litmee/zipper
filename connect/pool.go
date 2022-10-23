@@ -85,6 +85,6 @@ func (zp *zPool) addQueue(c ZipperConnect, m message.ZipperMessage) {
 	// generate request
 	zReq := NewZRequest(c, m)
 	// take the remainder to achieve pseudo load balancing, and stuff the request into the queue
-	i := time.Now().Second() % int(zp.size)
+	i := time.Now().Nanosecond() % int(zp.size)
 	zp.queuePool[i] <- zReq
 }
