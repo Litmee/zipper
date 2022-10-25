@@ -11,6 +11,7 @@ const (
 	ERROR
 )
 
+// logChan receive Log Pipeline Parameters
 var logChan chan string
 
 // OutLog output log to console
