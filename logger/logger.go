@@ -27,6 +27,7 @@ func OutLog(s string, t int) {
 	logChan <- s
 }
 
+// logServer log server
 func logServer(ctx context.Context) {
 	for {
 		str := <-logChan
