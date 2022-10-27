@@ -35,6 +35,7 @@ func logServer(ctx context.Context) {
 	}
 }
 
+// InitLogServer init logServer
 func InitLogServer(ctx context.Context, s uint16) {
 	logChan = make(chan string, s)
 	go logServer(ctx)
