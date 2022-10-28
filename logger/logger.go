@@ -5,6 +5,7 @@ import (
 	"log"
 )
 
+// const log level
 const (
 	INFO = iota
 	WARN
