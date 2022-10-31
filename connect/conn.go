@@ -127,6 +127,7 @@ func (zc *zConnect) stop() {
 	if zc.isClosed {
 		return
 	}
+	// send exit signal
 	zc.exitChan <- true
 	zc.isClosed = true
 	close(zc.msgChan)
