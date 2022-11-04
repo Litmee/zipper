@@ -17,7 +17,7 @@ var logChan chan string
 
 // OutLog output log to console
 func OutLog(s string, t int) {
-	// judge
+	// judge log type
 	switch t {
 	case INFO:
 		s = "INFO " + s
