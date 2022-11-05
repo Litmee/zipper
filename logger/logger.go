@@ -26,6 +26,7 @@ func OutLog(s string, t int) {
 	case ERROR:
 		s = "ERROR " + s
 	}
+	// send info
 	logChan <- s
 }
 
