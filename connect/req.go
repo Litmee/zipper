@@ -19,7 +19,10 @@ type zRequest struct {
 }
 
 func NewZRequest(c ZipperConnect, m message.ZipperMessage) ZipperRequest {
-	return &zRequest{c, m}
+	return &zRequest{
+		c,
+		m,
+	}
 }
 
 // GetMsgId get message id
