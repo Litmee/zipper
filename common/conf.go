@@ -29,7 +29,7 @@ type ZipperConfig struct {
 // GlobalConfig global configuration parameters
 var GlobalConfig *ZipperConfig
 
-// configuration initialization function
+// init configuration initialization function
 func init() {
 	fmt.Print(Banner)
 	fmt.Println(zipperVersion)
