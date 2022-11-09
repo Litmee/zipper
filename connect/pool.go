@@ -30,7 +30,9 @@ type zPool struct {
 }
 
 func NewZPool() ZipperPool {
-	return &zPool{rm: make(map[uint16]ZipperRouter)}
+	return &zPool{
+		rm: make(map[uint16]ZipperRouter),
+	}
 }
 
 // InitPool initialize the worker pool
