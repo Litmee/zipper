@@ -4,6 +4,7 @@ import (
 	"github.com/Litmee/zipper/message"
 )
 
+// ZipperRequest request message abstraction layer
 type ZipperRequest interface {
 	// GetMsgId get message id
 	GetMsgId() uint16
