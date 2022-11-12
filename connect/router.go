@@ -4,6 +4,7 @@ import (
 	"github.com/Litmee/zipper/message"
 )
 
+// ZipperRouter route layer abstract interface
 type ZipperRouter interface {
 	// Handler business processing hook function
 	Handler(ZipperRequest) message.ZipperMessage
