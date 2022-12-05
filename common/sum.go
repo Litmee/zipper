@@ -15,7 +15,7 @@ func Add() bool {
 	lock.Lock()
 	defer lock.Unlock()
 	curConnectNum++
-	if curConnectNum > 30 {
+	if curConnectNum > GlobalConfig.MaxConnect {
 		return false
 	}
 	return true
